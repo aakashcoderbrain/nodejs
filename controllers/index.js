@@ -6,6 +6,7 @@ const rootApi = function (req, res) {
 }
 
 const userLoginApi = async function (req, res) {
+    console.log("Login API Calling");
     const users = await dbConnect();
     const { email, password } = req.body;
     const userDetails = await users.findOne({ email });
@@ -27,6 +28,7 @@ const userLoginApi = async function (req, res) {
 };
 
 const registerApi = async function (req, res){
+    console.log("Register API Calling");
     const { firstname, lastname , email , password , dob} = req.body;
     if(email && password && firstname && lastname){
         const users = await dbConnect();
@@ -62,8 +64,83 @@ const registerApi = async function (req, res){
     }
 }
 
+const resetPasswordApi = async function (req, res) {
+    console.log("Reset Password API Calling");
+    const { email , password } = req.body;
+    const users = await dbConnect();
+    const findUsers = await users.findOne({email: email});          
+    if(findUsers) {
+        const updateData = await users.updateOne(
+            {email: email},
+            {$set: { password: password } }
+        );
+        if (updateData) {
+            res.send({ message: "password reset successfully",
+                status: 1});
+        } else {
+            res.send({ message: "password reset failed",
+                 status: 0});
+        } 
+    } 
+    else {
+        res.send({ message: "user not found!" , status: 0 });
+    } 
+}; 
+
+const deleteApi= async (req,res)=>{
+    console.log("Delete API Calling");
+    const username=req.params.email;
+      const users = await dbConnect(); 
+      const findUsers = await users.findOne({ email: username });
+      if (findUsers) {
+        const deleteData = await users.deleteOne(
+          { email: username }
+        );
+        if (deleteData) {
+          res.send({ message: "user deleted successfully", status: 1 });
+        } else {
+          res.send({ message: "user deleted failed", status: 0 });
+        }
+      } else {
+        res.send({ message: "User not found!", status: 0 });
+      }
+  };
+
+const forgetApi = async function (req, res) {
+    console.log("Forget Password API Calling");
+    const { email , password } = req.body; 
+    const users = await dbConnect();
+    
+    try {
+      const findUsers = await users.findOne({ email: email });
+      
+      if (findUsers) {
+        const updateData = await users.updateOne(
+          { email: email },
+          { $set: { password:password } } 
+         );
+        
+        if (updateData) {
+          res.send({ message: "Password reset successfully", status: 1 });
+        } else {
+          res.send({ message: "Password reset failed", status: 0 });
+        }
+      } else {
+        res.send({ message: "User not found!", status: 0 });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Internal server error", status: 0 });
+    }
+  };
+  
+
+
 module.exports ={
-    rootApi,
+    rootApi, 
     userLoginApi,
-    registerApi
+    registerApi,
+    resetPasswordApi,
+    deleteApi,
+    forgetApi
 }

@@ -8,6 +8,10 @@ app.use(express.json());
 app.use('/', routes);
 app.use('/login', routes);
 app.use('/signup', routes);
+app.use('/reset', routes);
+app.use('/delete', routes);
+app.use('/forget',routes);
+
 
 
 app.listen(PORT, () => {

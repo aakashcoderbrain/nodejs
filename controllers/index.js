@@ -121,7 +121,7 @@ const forgetApi = async function (req, res) {
          );
         
         if (updateData) {
-          res.send({ message: "Password reset successfully", status: 1 });
+          res.send({ message: "Password reset successfully ", status: 1 });
         } else {
           res.send({ message: "Password reset failed", status: 0 });
         }
